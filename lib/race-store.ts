@@ -42,9 +42,6 @@ export interface RaceInfo {
   country?: string
   laps?: number
   distance?: string
-  time?: string
-  firstPractice?: string
-  qualifying?: string
 }
 
 export interface RaceStore {
@@ -64,7 +61,7 @@ export interface RaceStore {
     date: string
     circuit: string
     predictions: JoinedItem[]
-    accuracy?: { top3: number, top5: number }
+    accuracy?: number
   } | null
   
   nextRace: RaceInfo | null
@@ -276,6 +273,6 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
       }
     })
     
-        return
+    return { success: true }
   }
 }))

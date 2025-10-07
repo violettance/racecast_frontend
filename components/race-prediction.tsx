@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Calendar, MapPin, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
-import { useRaceStore, type JoinedItem } from "@/lib/race-store"
+import { useRaceStore } from "@/lib/race-store"
 
 export function RacePrediction() {
   const { 

@@ -40,7 +40,8 @@ Thumbs.db
 # logs
 *.log
 
-# placeholder files
+# generated ui/components (ignore if you don't want to commit built UI)
+components/
+
+# placeholder assets
 public/placeholder*
-hooks/
-components/ui/
