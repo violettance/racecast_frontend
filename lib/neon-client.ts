@@ -34,6 +34,15 @@ export class NeonRestClient {
       throw new Error(`Neon query failed: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
+
+  public async query<T = unknown>(sqlText: string): Promise<T> {
+    try {
+      const result = await this.sql.query(sqlText)
+      return result as T
+    } catch (error) {
+      throw new Error(`Neon raw query failed: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
 }
 
 export const neonClient = new NeonRestClient()

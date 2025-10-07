@@ -1,7 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   /* F1 Racing Theme - Light Mode */
@@ -32,12 +31,24 @@
   --radius: 0.75rem;
   --sidebar: oklch(0.98 0.005 85);
   --sidebar-foreground: oklch(0.15 0.01 20);
-  --sidebar-primary: oklch(0.45 0.15 25);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.95 0.005 85);
-  --sidebar-accent-foreground: oklch(0.15 0.01 20);
+  --sidebar-primary: var(--bm-1);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--bm-1);
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: oklch(0.92 0.005 85);
   --sidebar-ring: oklch(0.45 0.15 25);
+
+  /* Constructor Team Colors */
+  --team-red-bull: #3671C6; /* dark blue */
+  --team-ferrari: #E8002D; /* red */
+  --team-mercedes: #27F4D2; /* turquoise */
+  --team-mclaren: #FF8000; /* papaya */
+  --team-alpine: #2293D1; /* blue */
+  --team-williams: #64C4FF; /* light blue */
+  --team-rb: #6692FF; /* RB blue */
+  --team-aston-martin: #229971; /* green */
+  --team-sauber: #00D084; /* bright green */
+  --team-haas: #9EA0A3; /* gray */
 }
 
 .dark {
@@ -69,58 +80,44 @@
   --sidebar-foreground: oklch(0.98 0.005 85);
   --sidebar-primary: oklch(0.55 0.18 25);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.22 0.01 20);
-  --sidebar-accent-foreground: oklch(0.98 0.005 85);
+  --sidebar-accent: var(--bm-1);
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: oklch(0.25 0.01 20);
   --sidebar-ring: oklch(0.55 0.18 25);
+
+  /* Constructor Team Colors (dark mode same) */
+  --team-red-bull: #3671C6;
+  --team-ferrari: #E8002D;
+  --team-mercedes: #27F4D2;
+  --team-mclaren: #FF8000;
+  --team-alpine: #2293D1;
+  --team-williams: #64C4FF;
+  --team-rb: #6692FF;
+  --team-aston-martin: #229971;
+  --team-sauber: #00D084;
+  --team-haas: #9EA0A3;
 }
 
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
+/* removed @theme inline for compatibility */
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .team-badge-red-bull { background-color: var(--team-red-bull); color: #ffffff; }
+  .team-badge-ferrari { background-color: var(--team-ferrari); color: #ffffff; }
+  .team-badge-mercedes { background-color: var(--team-mercedes); color: #0a0a0a; }
+  .team-badge-mclaren { background-color: var(--team-mclaren); color: #0a0a0a; }
+  .team-badge-alpine { background-color: var(--team-alpine); color: #ffffff; }
+  .team-badge-williams { background-color: var(--team-williams); color: #0a0a0a; }
+  .team-badge-rb { background-color: var(--team-rb); color: #ffffff; }
+  .team-badge-aston-martin { background-color: var(--team-aston-martin); color: #0a0a0a; }
+  .team-badge-sauber { background-color: var(--team-sauber); color: #0a0a0a; }
+  .team-badge-haas { background-color: var(--team-haas); color: #0a0a0a; }
 }

@@ -18,6 +18,7 @@ export interface ResultRow {
 }
 
 export interface EnhancedRow {
+  year: number
   driver_id: string
   driver_first_name: string
   driver_last_name: string
@@ -42,6 +43,9 @@ export interface RaceInfo {
   country?: string
   laps?: number
   distance?: string
+  time?: string
+  firstPractice?: string
+  qualifying?: string
 }
 
 export interface RaceStore {
@@ -54,6 +58,7 @@ export interface RaceStore {
   results: ResultRow[]
   enhancedDataset: EnhancedRow[]
   races: any[]
+  selectedYear: number | null
   
   // Processed data
   previousRace: {
@@ -61,7 +66,7 @@ export interface RaceStore {
     date: string
     circuit: string
     predictions: JoinedItem[]
-    accuracy?: number
+    accuracy?: { top3: number; top5: number }
   } | null
   
   nextRace: RaceInfo | null
@@ -75,9 +80,10 @@ export interface RaceStore {
   setRaces: (races: any[]) => void
   setPreviousRace: (previousRace: any) => void
   setNextRace: (nextRace: RaceInfo | null) => void
+  setSelectedYear: (year: number | null) => void
   
   // Fetch data action
-  fetchRaceData: () => Promise<void>
+  fetchRaceData: () => Promise<{ success: boolean }>
 }
 
 export const useRaceStore = create<RaceStore>((set, get) => ({
@@ -88,6 +94,7 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
   results: [],
   enhancedDataset: [],
   races: [],
+  selectedYear: null,
   previousRace: null,
   nextRace: null,
   
@@ -100,6 +107,7 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
   setRaces: (races) => set({ races }),
   setPreviousRace: (previousRace) => set({ previousRace }),
   setNextRace: (nextRace) => set({ nextRace }),
+  setSelectedYear: (year) => set({ selectedYear: year }),
   
   // Fetch data action
   fetchRaceData: async () => {
