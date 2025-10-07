@@ -2,110 +2,175 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from "react"
+import { getEraRegulationData, EraRegulationData } from "@/lib/era-analysis"
 
 export function EraRegulation() {
-  const eras = [
-    {
-      year: "2018-2021",
-      title: "Hybrid Era Dominance",
-      regulations: "V6 Turbo Hybrid, DRS, High Downforce",
-      dominantTeam: "Mercedes",
-      avgWins: 15.2,
-      characteristics: ["Mercedes dominance", "High downforce cars", "DRS overtaking"],
-    },
-    {
-      year: "2022-2023",
-      title: "Ground Effect Return",
-      regulations: "New Aerodynamic Rules, 18-inch Wheels, Budget Cap",
-      dominantTeam: "Red Bull Racing",
-      avgWins: 17.5,
-      characteristics: ["Ground effect aerodynamics", "Closer racing", "Red Bull dominance"],
-    },
-    {
-      year: "2024-2025",
-      title: "Competitive Balance",
-      regulations: "Refined Ground Effect, Sprint Races, Sustainable Fuels",
-      dominantTeam: "Red Bull Racing / McLaren",
-      avgWins: 12.3,
-      characteristics: ["Multiple race winners", "Closer championship", "McLaren resurgence"],
-    },
-  ]
+  const [data, setData] = useState<EraRegulationData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        console.log('Fetching era regulation data...')
+        const eraData = await getEraRegulationData()
+        console.log('Era data received:', eraData)
+        setData(eraData)
+      } catch (err) {
+        console.error('Error fetching era data:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold text-foreground mb-2">Era & Regulation Analysis</h2>
+          <p className="text-muted-foreground">Loading performance trends across different F1 regulation periods...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-border shadow-sm">
+              <CardHeader className="pb-3">
+                <div className="h-4 bg-muted animate-pulse rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-muted animate-pulse rounded mb-2"></div>
+                <div className="h-3 bg-muted animate-pulse rounded"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold text-foreground mb-2">Era & Regulation Analysis</h2>
+          <p className="text-muted-foreground">Error loading data: {error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!data) {
+    console.log('No data available')
+    return null
+  }
+  
+  console.log('Rendering with data:', data)
+  console.log('Era comparisons:', data.era_comparisons)
+  console.log('Key insights:', data.key_insights)
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Era & Regulation Analysis</h2>
-        <p className="text-muted-foreground">Performance trends across different F1 regulation periods (2018-2025)</p>
+        <p className="text-muted-foreground">Performance trends across different F1 regulation periods (2018-2024)</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-border shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Years Analyzed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-foreground">7</p>
-            <p className="text-xs text-muted-foreground mt-1">2018 to 2025</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Regulation Changes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-foreground">3</p>
-            <p className="text-xs text-muted-foreground mt-1">Major updates</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Races</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-foreground">156</p>
-            <p className="text-xs text-muted-foreground mt-1">Across all eras</p>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Era Comparison Metrics */}
       <div className="space-y-4">
-        {eras.map((era, index) => (
-          <Card key={era.year} className="border-border shadow-sm">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline">{era.year}</Badge>
-                    <CardTitle className="text-xl">{era.title}</CardTitle>
+        
+        {data.era_comparisons && data.era_comparisons.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {data.era_comparisons.map((comparison, index) => (
+            <Card key={comparison.metric} className="border-border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-foreground text-center">
+                  {comparison.description}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-muted/20 rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">2018-2021</div>
+                      <div className="text-xl font-bold text-foreground">
+                        {comparison.era_2018_2021.toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/20 rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">2022+</div>
+                      <div className="text-xl font-bold text-foreground">
+                        {comparison.era_2022_plus.toFixed(2)}
+                      </div>
+                    </div>
                   </div>
-                  <CardDescription>{era.regulations}</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Dominant Team</p>
-                  <p className="text-lg font-bold text-foreground">{era.dominantTeam}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Avg Wins per Season</p>
-                  <p className="text-lg font-bold text-foreground">{era.avgWins}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Key Characteristics</p>
-                  <div className="flex flex-wrap gap-2">
-                    {era.characteristics.map((char) => (
-                      <Badge key={char} variant="secondary" className="text-xs">
-                        {char}
-                      </Badge>
-                    ))}
+                  
+                  <div className="text-center p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-1">Change</div>
+                    <div className={`text-lg font-bold ${
+                      comparison.difference > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {comparison.difference > 0 ? '+' : ''}{comparison.difference.toFixed(2)}
+                      {comparison.percentage_change !== 0 && (
+                        <span className="text-sm ml-2 opacity-75">
+                          ({comparison.percentage_change > 0 ? '+' : ''}{comparison.percentage_change.toFixed(1)}%)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-muted/30 rounded-lg">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {comparison.metric === 'avg_lap_time' && 
+                        "Lap times got slightly slower after 2022 because ground-effect cars and 18-inch tires focused on closer racing instead of pure speed."}
+                      {comparison.metric === 'avg_speed' && 
+                        "Average speeds dropped a bit since 2022 as ground-effect aerodynamics reduced drag efficiency to improve raceability."}
+                      {comparison.metric === 'position_gained' && 
+                        "Overtaking became easier after 2022 because ground-effect cars could follow more closely with less dirty air."}
+                      {comparison.metric === 'thermal_sensitivity' && 
+                        "Cars became more temperature-sensitive after 2022 since the new tires and floor-driven downforce reacted more sharply to heat changes."}
+                    </p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No era comparison data available</p>
+          </div>
+        )}
+      </div>
+
+      {/* Key Insights */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-2xl font-bold text-foreground mb-2">Key Insights</h3>
+          <p className="text-muted-foreground">Major trends and changes across regulation periods</p>
+        </div>
+        
+        {data.key_insights && data.key_insights.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {data.key_insights.map((insight, index) => (
+            <Card key={index} className="border-border shadow-sm">
+              <CardContent className="pt-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-sm text-foreground">{insight}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No key insights available</p>
+          </div>
+        )}
       </div>
     </div>
   )

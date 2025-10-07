@@ -7,6 +7,9 @@ const config = {
     "./pages/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {

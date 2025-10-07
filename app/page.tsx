@@ -32,7 +32,7 @@ export default function F1Dashboard() {
     },
     { id: "driver" as TabType, label: "Driver Performance", icon: Users, description: "Driver-based analysis" },
     { id: "constructor" as TabType, label: "Team Performance", icon: Flag, description: "Team-based analysis" },
-    { id: "era" as TabType, label: "Era & Regulation", icon: TrendingUp, description: "2018–2025 period analysis" },
+    { id: "era" as TabType, label: "Era & Regulation", icon: TrendingUp, description: "2018–2024 period analysis" },
     {
       id: "personality" as TabType,
       label: "Driver Personality",
