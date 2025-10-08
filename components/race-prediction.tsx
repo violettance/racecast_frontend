@@ -60,7 +60,7 @@ export function RacePrediction() {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
-        <p className="text-muted-foreground">AI-powered predictions based on 2018-2024 F1 data analysis</p>
+        <p className="text-muted-foreground">Predictions based on 2018-2024 F1 data analysis</p>
       </div>
 
       {/* Previous Race Results */}
@@ -70,7 +70,7 @@ export function RacePrediction() {
           <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-primary" />
+                      <Trophy className="w-5 h-5 text-destructive" />
                       Previous Race: {previousRace.name}
                     </CardTitle>
                     <CardDescription className="mt-1">
@@ -97,7 +97,7 @@ export function RacePrediction() {
               <div className="col-span-2">Prediction</div>
                 <div className="col-span-1">Actual Rank</div>
             </div>
-              {previousRace.predictions?.map((item: JoinedItem) => (
+              {previousRace.predictions?.map((item: any) => (
               <div
                   key={`${item.driverCode}-${item.position}`}
                 className="grid grid-cols-12 gap-4 items-center py-2 rounded-lg hover:bg-muted/50 transition-colors"
@@ -126,7 +126,7 @@ export function RacePrediction() {
             <Card className="border-border shadow-sm bg-gradient-to-br from-card to-muted/20">
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-primary" />
+                  <Calendar className="w-5 h-5 text-destructive" />
                   Next Race: {nextRace.name}
                 </CardTitle>
                 <CardDescription className="mt-1">
@@ -136,21 +136,21 @@ export function RacePrediction() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <MapPin className="w-5 h-5 text-primary" />
+                    <MapPin className="w-5 h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Circuit</p>
                       <p className="font-medium text-sm text-foreground">{nextRace.circuit}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <Clock className="w-5 h-5 text-primary" />
+                    <Clock className="w-5 h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Race Time (UTC)</p>
                       <p className="font-medium text-sm text-foreground">{nextRace.time || "TBA"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <Trophy className="w-5 h-5 text-primary" />
+                    <Trophy className="w-5 h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Days to Qualifying</p>
                       <p className="font-medium text-sm text-foreground">
@@ -169,8 +169,8 @@ export function RacePrediction() {
                   </div>
                 </div>
 
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-accent/10 border border-accent/20">
-            <AlertCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-sm text-foreground mb-1">Prediction Pending</p>
               <p className="text-sm text-muted-foreground leading-relaxed">

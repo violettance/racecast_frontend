@@ -2,34 +2,21 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useEffect, useState } from "react"
-import { getEraRegulationData, EraRegulationData } from "@/lib/era-analysis"
+import { getEraRegulationData } from "@/lib/era-analysis"
+import { useQuery } from "@tanstack/react-query"
 
 export function EraRegulation() {
-  const [data, setData] = useState<EraRegulationData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['era-regulation'],
+    queryFn: getEraRegulationData,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+  })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        console.log('Fetching era regulation data...')
-        const eraData = await getEraRegulationData()
-        console.log('Era data received:', eraData)
-        setData(eraData)
-      } catch (err) {
-        console.error('Error fetching era data:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load data')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div>
@@ -58,7 +45,7 @@ export function EraRegulation() {
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-2">Era & Regulation Analysis</h2>
-          <p className="text-muted-foreground">Error loading data: {error}</p>
+          <p className="text-muted-foreground">Error loading data</p>
         </div>
       </div>
     )
@@ -112,7 +99,7 @@ export function EraRegulation() {
                   <div className="text-center p-3 bg-primary/5 border border-primary/20 rounded-lg">
                     <div className="text-xs text-muted-foreground mb-1">Change</div>
                     <div className={`text-lg font-bold ${
-                      comparison.difference > 0 ? 'text-green-600' : 'text-red-600'
+                      comparison.difference > 0 ? 'text-green-600' : 'text-destructive'
                     }`}>
                       {comparison.difference > 0 ? '+' : ''}{comparison.difference.toFixed(2)}
                       {comparison.percentage_change !== 0 && (
@@ -159,7 +146,7 @@ export function EraRegulation() {
             <Card key={index} className="border-border shadow-sm">
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-destructive rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-sm text-foreground">{insight}</p>
                 </div>
               </CardContent>
