@@ -503,7 +503,7 @@ export function DriverPerformance() {
               >
                 <div className="col-span-1">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm !text-white ${
                       (row.team || '').toLowerCase().includes('red bull') ? 'team-badge-red-bull' :
                       (row.team || '').toLowerCase().includes('ferrari') ? 'team-badge-ferrari' :
                       (row.team || '').toLowerCase().includes('mercedes') ? 'team-badge-mercedes' :
@@ -513,7 +513,7 @@ export function DriverPerformance() {
                       (row.team || '').toLowerCase().includes('rb') ? 'team-badge-rb' :
                       (row.team || '').toLowerCase().includes('aston') ? 'team-badge-aston-martin' :
                       (row.team || '').toLowerCase().includes('stake') || (row.team || '').toLowerCase().includes('sauber') ? 'team-badge-sauber' :
-                      (row.team || '').toLowerCase().includes('haas') ? 'team-badge-haas' : 'bg-muted text-foreground'
+                      (row.team || '').toLowerCase().includes('haas') ? 'team-badge-haas' : 'bg-muted'
                     }`}
                   >
                     {index + 1}

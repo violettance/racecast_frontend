@@ -60,6 +60,13 @@ export interface RaceStore {
   races: any[]
   selectedYear: number | null
   
+  // Winning Trends state
+  selectedDriver: string
+  selectedConstructor: string
+  
+  // Driver Personality hover state
+  hoveredArchetype: string | null
+  
   // Processed data
   previousRace: {
     name: string
@@ -81,6 +88,9 @@ export interface RaceStore {
   setPreviousRace: (previousRace: any) => void
   setNextRace: (nextRace: RaceInfo | null) => void
   setSelectedYear: (year: number | null) => void
+  setSelectedDriver: (driver: string) => void
+  setSelectedConstructor: (constructor: string) => void
+  setHoveredArchetype: (archetype: string | null) => void
   
   // Fetch data action
   fetchRaceData: () => Promise<{ success: boolean }>
@@ -95,6 +105,9 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
   enhancedDataset: [],
   races: [],
   selectedYear: null,
+  selectedDriver: "max_verstappen",
+  selectedConstructor: "red_bull",
+  hoveredArchetype: null,
   previousRace: null,
   nextRace: null,
   
@@ -108,6 +121,9 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
   setPreviousRace: (previousRace) => set({ previousRace }),
   setNextRace: (nextRace) => set({ nextRace }),
   setSelectedYear: (year) => set({ selectedYear: year }),
+  setSelectedDriver: (driver) => set({ selectedDriver: driver }),
+  setSelectedConstructor: (constructor) => set({ selectedConstructor: constructor }),
+  setHoveredArchetype: (archetype) => set({ hoveredArchetype: archetype }),
   
   // Fetch data action
   fetchRaceData: async () => {

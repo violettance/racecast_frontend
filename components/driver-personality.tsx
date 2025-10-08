@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { Info } from "lucide-react"
 import { neonClient } from "@/lib/neon-client"
+import { useRaceStore } from "@/lib/race-store"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -60,6 +61,8 @@ function formatDescription(desc: string | undefined) {
 
 export function DriverPersonality() {
   const [selectedYear, setSelectedYear] = useState<string>("2024")
+  const hoveredArchetype = useRaceStore((s) => s.hoveredArchetype)
+  const setHoveredArchetype = useRaceStore((s) => s.setHoveredArchetype)
   type WinsRow = { typology: string | null; drivers: number; wins: number; podiums: number; avg_speed: number | null }
   const { data: winsData, isLoading: isLoadingWins, isError: isErrorWins, error: errorWins } = useQuery({
     queryKey: ["driver-personality-wins", selectedYear],
@@ -126,27 +129,34 @@ export function DriverPersonality() {
     refetchInterval: false,
   })
 
-  if (isLoadingWins) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground mb-2">Driver Personality</h2>
-          <p className="text-muted-foreground">Archetype distribution in {selectedYear}</p>
-        </div>
-        <Card className="border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Loading wins by typology</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-[90%]" />
-            <Skeleton className="h-6 w-[75%]" />
-            <Skeleton className="h-6 w-[60%]" />
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  // Fetch drivers by archetype for tooltips
+  const { data: archetypeDrivers } = useQuery({
+    queryKey: ["driver-personality-archetype-drivers", selectedYear],
+    queryFn: async () => {
+      return await neonClient.query<{typology: string, driver_full_name: string}[]>(
+        `WITH names AS (
+           SELECT TRIM(CONCAT(driver_first_name, ' ', driver_last_name)) AS full_name
+           FROM enhanced_dataset
+           WHERE driver_first_name IS NOT NULL AND driver_last_name IS NOT NULL
+             AND year = ${Number(selectedYear)}
+           GROUP BY 1
+         )
+         SELECT UPPER(TRIM(dp.typology)) AS typology,
+                dp.driver_full_name
+         FROM driver_personality dp
+         JOIN names n ON LOWER(TRIM(dp.driver_full_name)) = LOWER(TRIM(n.full_name))
+         WHERE dp.typology IS NOT NULL AND TRIM(dp.typology) <> ''
+         ORDER BY dp.typology, dp.driver_full_name`
+      )
+    },
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+  })
+
+  // Remove the early return for loading state - let the component render normally with loading indicators
 
   if (isErrorWins) {
     return (
@@ -195,8 +205,15 @@ export function DriverPersonality() {
       </div>
 
       <Card className="border-border shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">Driver Typology Analysis</CardTitle>
+        </CardHeader>
         <CardContent>
-          {!winsData || winsData.length === 0 ? (
+          {isLoadingWins ? (
+            <div className="flex items-center justify-center py-8">
+              <p className="text-sm text-muted-foreground">Loading driver personality data...</p>
+            </div>
+          ) : !winsData || winsData.length === 0 ? (
             <p className="text-sm text-muted-foreground">No data available</p>
           ) : (
             (() => {
@@ -211,20 +228,53 @@ export function DriverPersonality() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Archetype</TableHead>
-                      <TableHead className="text-right">Drivers</TableHead>
-                      <TableHead className="text-right">Wins</TableHead>
-                      <TableHead className="text-right">Podiums</TableHead>
-                      <TableHead className="text-right">Avg speed</TableHead>
-                      <TableHead className="text-right">Efficiency (wins/drivers)</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground">Archetype</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Drivers</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Wins</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Podiums</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Avg speed</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Efficiency (wins/drivers)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mapped.map(({ label, drivers, wins, efficiency }) => (
-                      <TableRow key={label}>
-                        <TableCell className="font-medium">
+                      <TableRow key={label} className="py-4">
+                        <TableCell className="font-medium py-4">
                           <div className="flex flex-col">
-                            <span>{label}</span>
+                            <div className="flex items-center gap-2 relative">
+                              <span>{label}</span>
+                              <Info 
+                                className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-help transition-colors"
+                                onMouseEnter={() => setHoveredArchetype(label)}
+                                onMouseLeave={() => setHoveredArchetype(null)}
+                              />
+                              {hoveredArchetype === label && (
+                                <div className="absolute top-6 left-0 z-50 bg-white border border-gray-200 shadow-lg p-3 rounded-md min-w-[200px]">
+                                  <div className="text-sm text-gray-800">
+                                    {(() => {
+                                      // Find the MBTI code for this label
+                                      const entry = Object.entries(MBTI_TITLES).find(([, v]) => v === label)
+                                      const code = entry?.[0] || ''
+                                      
+                                      // Get drivers for this archetype
+                                      const drivers = archetypeDrivers?.filter(d => d.typology === code) || []
+                                      
+                                      return drivers.length > 0 ? (
+                                        <div className="space-y-1">
+                                          {drivers.map((driver, idx) => (
+                                            <div key={idx}>
+                                              {driver.driver_full_name}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <div className="text-gray-500">No drivers found</div>
+                                      )
+                                    })()}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                             <span className="text-xs text-muted-foreground">
                               {(() => {
                                 // Reverse mapping: find code whose title matches label
@@ -235,23 +285,23 @@ export function DriverPersonality() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-right tabular-nums">{drivers}</TableCell>
-                        <TableCell className="text-right tabular-nums">{wins}</TableCell>
-                        <TableCell className="text-right tabular-nums">
+                        <TableCell className="text-right tabular-nums py-4">{drivers}</TableCell>
+                        <TableCell className="text-right tabular-nums py-4">{wins}</TableCell>
+                        <TableCell className="text-right tabular-nums py-4">
                           {(() => {
                             const row = rows.find(r => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
                             const v = row?.podiums
                             return v == null ? '-' : Number(v)
                           })()}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums">
+                        <TableCell className="text-right tabular-nums py-4">
                           {(() => {
                             const row = rows.find(r => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
                             const v = row?.avg_speed
                             return v == null ? '-' : Number(v).toFixed(1)
                           })()}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums">{efficiency.toFixed(2)}</TableCell>
+                        <TableCell className="text-right tabular-nums py-4">{efficiency.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -264,14 +314,12 @@ export function DriverPersonality() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Why They Chose Their Numbers</CardTitle>
+          <CardTitle className="text-lg">Number Selection Patterns</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoadingWhy ? (
-            <div className="space-y-3">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-[90%]" />
-              <Skeleton className="h-6 w-[75%]" />
+            <div className="flex items-center justify-center py-8">
+              <p className="text-sm text-muted-foreground">Loading number selection data...</p>
             </div>
           ) : isErrorWhy ? (
             <p className="text-sm text-destructive">{(errorWhy as Error)?.message || 'Failed to load'}</p>

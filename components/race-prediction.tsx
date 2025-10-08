@@ -79,10 +79,10 @@ export function RacePrediction() {
                   </div>
                   {previousRace.accuracy && (
                     <div className="flex gap-2">
-                      <Badge className="text-sm bg-green-100 text-green-800 border-green-200 hover:bg-green-200">
+                      <Badge className="text-sm bg-green-600 text-white border-green-600 hover:bg-green-700">
                         Top 3: {previousRace.accuracy.top3}%
                       </Badge>
-                      <Badge className="text-sm bg-green-100 text-green-800 border-green-200 hover:bg-green-200">
+                      <Badge className="text-sm bg-green-600 text-white border-green-600 hover:bg-green-700">
                         Top 5: {previousRace.accuracy.top5}%
                       </Badge>
                     </div>

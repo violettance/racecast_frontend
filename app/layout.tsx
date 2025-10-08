@@ -6,7 +6,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
+  title: 'RaceCast',
   description: 'Created with v0',
   generator: 'v0.app',
 }
