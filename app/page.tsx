@@ -7,7 +7,7 @@ import { DriverPerformance } from "@/components/driver-performance"
 import { ConstructorPerformance } from "@/components/constructor-performance"
 import { EraRegulation } from "@/components/era-regulation"
 import { DriverPersonality } from "@/components/driver-personality"
-import { RaceStrategyLab } from "@/components/race-strategy-lab"
+import { WinningTrends } from "@/components/winning-trends"
 
 type TabType = "race" | "driver" | "constructor" | "era" | "personality" | "strategy"
 
@@ -108,7 +108,7 @@ export default function F1Dashboard() {
           {activeTab === "constructor" && <ConstructorPerformance />}
           {activeTab === "era" && <EraRegulation />}
           {activeTab === "personality" && <DriverPersonality />}
-          {activeTab === "strategy" && <RaceStrategyLab />}
+          {activeTab === "strategy" && <WinningTrends />}
         </div>
       </main>
     </div>

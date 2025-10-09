@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { neonClient } from "@/lib/neon-client"
 import { useRaceStore } from "@/lib/race-store"
 
-export function RaceStrategyLab() {
+export function WinningTrends() {
   const selectedDriver = useRaceStore((s) => s.selectedDriver)
   const selectedConstructor = useRaceStore((s) => s.selectedConstructor)
   const setSelectedDriver = useRaceStore((s) => s.setSelectedDriver)
