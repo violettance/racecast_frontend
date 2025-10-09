@@ -175,7 +175,7 @@ The application implements intelligent caching based on race calendar:
 
 ## 📄 License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0. (GPL-3.0)
 
 **Important:** GPL v3 requires that any derivative works must also be open source and licensed under GPL v3 or compatible license.
 
