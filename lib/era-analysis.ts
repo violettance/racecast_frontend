@@ -23,15 +23,10 @@ export interface EraRegulationData {
 
 export async function getEraRegulationData(): Promise<EraRegulationData> {
   try {
-    console.log('Starting era regulation data fetch...')
-    
     // Check if database URL is available
     if (!process.env.NEXT_PUBLIC_DATABASE_URL) {
-      console.log('No database URL found, using fallback data')
       throw new Error('Database connection not configured')
     }
-    
-    console.log('Database URL found, querying database...')
 
     // Get basic statistics
     const basicStats = await neonClient.query(`
@@ -199,7 +194,6 @@ export async function getEraRegulationData(): Promise<EraRegulationData> {
 
   } catch (error) {
     console.error('Error fetching era regulation data:', error)
-    console.log('Returning fallback data...')
     
     // Return fallback data when database is not available
     return {

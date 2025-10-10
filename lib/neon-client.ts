@@ -7,7 +7,9 @@ export class NeonRestClient {
 
   constructor() {
     // Use Neon Serverless Driver with direct connection
-    this.sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL!)
+    this.sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL!, {
+      disableWarningInBrowsers: true
+    })
   }
 
   public async get<T = unknown>(path: string, params?: QueryParams): Promise<T> {

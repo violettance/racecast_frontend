@@ -31,6 +31,7 @@
 - **Data Fetching**: TanStack Query (React Query) with smart caching
 - **Charts**: Recharts for data visualization
 - **Icons**: Lucide React
+- **Mobile Responsive**: Optimized for mobile devices with hamburger menu navigation
 
 ### Backend & Data
 - **Database**: Neon PostgreSQL (serverless)
@@ -113,7 +114,14 @@ The application is optimized for deployment on Vercel:
 ```
 racecast_frontend/
 ├── app/                    # Next.js app directory
-│   ├── api/cron/          # Cron job endpoints
+│   ├── api/               # Server-side API routes
+│   │   ├── cron/          # Cron job endpoints
+│   │   ├── race-prediction/  # Race predictions and results API
+│   │   ├── driver-performance/  # Driver analytics API
+│   │   ├── constructor-performance/  # Constructor analytics API
+│   │   ├── driver-personality/  # Personality analysis API
+│   │   ├── winning-trends/  # Historical trends API
+│   │   └── era-analysis/  # Era regulation API
 │   ├── layout.tsx         # Root layout
 │   └── page.tsx           # Main dashboard
 ├── components/            # React components
@@ -164,6 +172,23 @@ The application implements intelligent caching based on race calendar:
 - **Base URL**: `https://api.jolpi.ca/ergast/`
 - **No authentication required**
 - **Real-time F1 data**: Results, standings, race information
+
+### Internal API Endpoints (SQL Obfuscation)
+The application uses server-side API routes to prevent SQL queries from being exposed in the browser:
+
+- **`/api/race-prediction`** - Race predictions, results, and race information
+- **`/api/driver-performance`** - Driver performance analytics and standings
+- **`/api/constructor-performance`** - Constructor performance and team analytics
+- **`/api/driver-personality`** - Driver personality analysis and archetype data
+- **`/api/winning-trends`** - Historical winning trends for drivers and constructors
+- **`/api/era-analysis`** - Era and regulation analysis data
+- **`/api/cron`** - Automated cron job endpoints for predictions and result updates
+
+**Security Benefits:**
+- SQL queries are never exposed to the client-side
+- Database connection strings remain server-side only
+- Enhanced data protection and query optimization
+- Better performance through server-side query execution
 
 ## 🤝 Contributing
 

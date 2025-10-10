@@ -192,26 +192,18 @@ export const useRaceStore = create<RaceStore>((set, get) => ({
   // Fetch data action
   fetchRaceData: async () => {
     try {
-      // Import neonClient dynamically to avoid SSR issues
-      const { neonClient } = await import('./neon-client')
-      
-      // Fetch only essential data first
-      const [preds, res, raceResponse] = await Promise.all([
-        neonClient.get<PredictionRow[]>("public.predictions", {
-          order: "year.desc,round.desc,position.asc",
-          limit: 50, // Reduced limit
-        }),
-        neonClient.get<ResultRow[]>("public.results", {
-          order: "year.desc,round.desc,position.asc",
-          limit: 50, // Reduced limit
-        }),
-        fetch('https://api.jolpi.ca/ergast/f1/2025/races').then(res => res.json())
+      // Fetch data from API endpoints instead of direct database access
+      const [predsResponse, resResponse, racesResponse, enhResponse] = await Promise.all([
+        fetch('/api/race-prediction?type=predictions').then(res => res.json()),
+        fetch('/api/race-prediction?type=results').then(res => res.json()),
+        fetch('/api/race-prediction?type=races').then(res => res.json()),
+        fetch('/api/race-prediction?type=enhanced_dataset').then(res => res.json())
       ])
       
-      // Fetch enhanced dataset separately (less critical)
-      const enh = await neonClient.get<EnhancedRow[]>("public.enhanced_dataset")
-    
-    const races = raceResponse.MRData.RaceTable.Races
+      const preds = predsResponse.data as PredictionRow[]
+      const res = resResponse.data as ResultRow[]
+      const races = racesResponse.data
+      const enh = enhResponse.data as EnhancedRow[]
     
     // Update store with raw data
     set({ 

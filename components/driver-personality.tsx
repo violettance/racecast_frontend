@@ -67,33 +67,10 @@ export function DriverPersonality() {
   const { data: winsData, isLoading: isLoadingWins, isError: isErrorWins, error: errorWins } = useQuery({
     queryKey: ["driver-personality-wins", selectedYear],
     queryFn: async () => {
-      return await neonClient.query<WinsRow[]>(
-        `WITH names AS (
-            SELECT TRIM(CONCAT(driver_first_name, ' ', driver_last_name)) AS full_name,
-                   position,
-                   avg_speed
-           FROM enhanced_dataset
-            WHERE driver_first_name IS NOT NULL AND driver_last_name IS NOT NULL
-              AND year = ${Number(selectedYear)}
-         ),
-          joined AS (
-            SELECT UPPER(TRIM(dp.typology)) AS typology,
-                   n.full_name,
-                   n.position,
-                   n.avg_speed
-            FROM driver_personality dp
-            JOIN names n ON LOWER(TRIM(dp.driver_full_name)) = LOWER(TRIM(n.full_name))
-            WHERE dp.typology IS NOT NULL AND TRIM(dp.typology) <> ''
-          )
-          SELECT typology,
-                 COUNT(DISTINCT LOWER(TRIM(full_name)))::int AS drivers,
-                 COUNT(*) FILTER (WHERE position = 1)::int AS wins,
-                 COUNT(*) FILTER (WHERE position <= 3)::int AS podiums,
-                 AVG(avg_speed)::float AS avg_speed
-          FROM joined
-          GROUP BY typology
-          ORDER BY wins DESC`
-      )
+      const response = await fetch(`/api/driver-personality?type=wins&year=${selectedYear}`)
+      if (!response.ok) throw new Error('Failed to fetch driver personality wins data')
+      const data = await response.json()
+      return data.data || []
     },
     staleTime: Infinity,
     gcTime: Infinity,
@@ -106,21 +83,10 @@ export function DriverPersonality() {
   const { data: whyData, isLoading: isLoadingWhy, isError: isErrorWhy, error: errorWhy } = useQuery({
     queryKey: ["driver-personality-why-categorical", selectedYear],
     queryFn: async () => {
-      return await neonClient.query<WhyRow[]>(
-        `WITH names AS (
-           SELECT TRIM(CONCAT(driver_first_name, ' ', driver_last_name)) AS full_name
-           FROM enhanced_dataset
-           WHERE driver_first_name IS NOT NULL AND driver_last_name IS NOT NULL
-             AND year = ${Number(selectedYear)}
-           GROUP BY 1
-         )
-         SELECT COALESCE(dp.why_choose_number_categorical, 'Unknown') AS bucket,
-                COUNT(DISTINCT LOWER(TRIM(dp.driver_full_name)))::int AS count
-         FROM driver_personality dp
-         JOIN names n ON LOWER(TRIM(dp.driver_full_name)) = LOWER(TRIM(n.full_name))
-         GROUP BY 1
-         ORDER BY count DESC`
-      )
+      const response = await fetch(`/api/driver-personality?type=why&year=${selectedYear}`)
+      if (!response.ok) throw new Error('Failed to fetch driver personality why data')
+      const data = await response.json()
+      return data.data || []
     },
     staleTime: Infinity,
     gcTime: Infinity,
@@ -133,21 +99,10 @@ export function DriverPersonality() {
   const { data: archetypeDrivers } = useQuery({
     queryKey: ["driver-personality-archetype-drivers", selectedYear],
     queryFn: async () => {
-      return await neonClient.query<{typology: string, driver_full_name: string}[]>(
-        `WITH names AS (
-           SELECT TRIM(CONCAT(driver_first_name, ' ', driver_last_name)) AS full_name
-           FROM enhanced_dataset
-           WHERE driver_first_name IS NOT NULL AND driver_last_name IS NOT NULL
-             AND year = ${Number(selectedYear)}
-           GROUP BY 1
-         )
-         SELECT UPPER(TRIM(dp.typology)) AS typology,
-                dp.driver_full_name
-         FROM driver_personality dp
-         JOIN names n ON LOWER(TRIM(dp.driver_full_name)) = LOWER(TRIM(n.full_name))
-         WHERE dp.typology IS NOT NULL AND TRIM(dp.typology) <> ''
-         ORDER BY dp.typology, dp.driver_full_name`
-      )
+      const response = await fetch(`/api/driver-personality?type=archetype_drivers&year=${selectedYear}`)
+      if (!response.ok) throw new Error('Failed to fetch archetype drivers data')
+      const data = await response.json()
+      return data.data || []
     },
     staleTime: Infinity,
     gcTime: Infinity,
@@ -217,34 +172,34 @@ export function DriverPersonality() {
             <p className="text-sm text-muted-foreground">No data available</p>
           ) : (
             (() => {
-              const rows = winsData.filter(r => r.typology)
-              const mapped = rows.map(r => ({
+              const rows = winsData.filter((r: any) => r.typology)
+              const mapped = rows.map((r: any) => ({
                 label: MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || ''),
                 drivers: Number(r.drivers || 0),
                 wins: Number(r.wins || 0),
                 efficiency: Number(r.drivers || 0) > 0 ? Number(r.wins || 0) / Number(r.drivers || 0) : 0,
               }))
               return (
-                <Table>
+                <Table className="w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs font-medium text-muted-foreground">Archetype</TableHead>
-                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Drivers</TableHead>
-                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Wins</TableHead>
-                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Podiums</TableHead>
-                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Avg speed</TableHead>
-                      <TableHead className="text-right text-xs font-medium text-muted-foreground">Efficiency (wins/drivers)</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground w-2/3 md:w-auto text-left">Archetype</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground w-1/6 md:w-auto text-center">Drivers</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground w-1/6 md:w-auto text-center">Wins</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground hidden md:table-cell">Podiums</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground hidden md:table-cell">Avg speed</TableHead>
+                      <TableHead className="text-right text-xs font-medium text-muted-foreground hidden md:table-cell">Efficiency (wins/drivers)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mapped.map(({ label, drivers, wins, efficiency }) => (
+                    {mapped.map(({ label, drivers, wins, efficiency }: any) => (
                       <TableRow key={label} className="py-4">
-                        <TableCell className="font-medium py-4">
+                        <TableCell className="font-medium py-4 w-2/3 md:w-auto text-left">
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2 relative">
-                              <span>{label}</span>
+                              <span className="truncate text-xs md:text-base">{label}</span>
                               <Info 
-                                className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-help transition-colors"
+                                className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-help transition-colors flex-shrink-0"
                                 onMouseEnter={() => setHoveredArchetype(label)}
                                 onMouseLeave={() => setHoveredArchetype(null)}
                               />
@@ -257,11 +212,11 @@ export function DriverPersonality() {
                                       const code = entry?.[0] || ''
                                       
                                       // Get drivers for this archetype
-                                      const drivers = archetypeDrivers?.filter(d => d.typology === code) || []
+                                      const drivers = archetypeDrivers?.filter((d: any) => d.typology === code) || []
                                       
                                       return drivers.length > 0 ? (
                                         <div className="space-y-1">
-                                          {drivers.map((driver, idx) => (
+                                          {drivers.map((driver: any, idx: number) => (
                                             <div key={idx}>
                                               {driver.driver_full_name}
                                             </div>
@@ -275,7 +230,7 @@ export function DriverPersonality() {
                                 </div>
                               )}
                             </div>
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-xs text-muted-foreground hidden md:block">
                               {(() => {
                                 // Reverse mapping: find code whose title matches label
                                 const entry = Object.entries(MBTI_TITLES).find(([, v]) => v === label)
@@ -285,23 +240,23 @@ export function DriverPersonality() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-right tabular-nums py-4">{drivers}</TableCell>
-                        <TableCell className="text-right tabular-nums py-4">{wins}</TableCell>
-                        <TableCell className="text-right tabular-nums py-4">
+                        <TableCell className="tabular-nums py-4 w-1/6 md:w-auto text-center text-xs md:text-base">{drivers}</TableCell>
+                        <TableCell className="tabular-nums py-4 w-1/6 md:w-auto text-center text-xs md:text-base">{wins}</TableCell>
+                        <TableCell className="text-right tabular-nums py-4 hidden md:table-cell">
                           {(() => {
-                            const row = rows.find(r => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
+                            const row = rows.find((r: any) => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
                             const v = row?.podiums
                             return v == null ? '-' : Number(v)
                           })()}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums py-4">
+                        <TableCell className="text-right tabular-nums py-4 hidden md:table-cell">
                           {(() => {
-                            const row = rows.find(r => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
+                            const row = rows.find((r: any) => (MBTI_TITLES[(r.typology || '').toUpperCase()] || (r.typology || '')) === label)
                             const v = row?.avg_speed
                             return v == null ? '-' : Number(v).toFixed(1)
                           })()}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums py-4">{efficiency.toFixed(2)}</TableCell>
+                        <TableCell className="text-right tabular-nums py-4 hidden md:table-cell">{efficiency.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -328,15 +283,15 @@ export function DriverPersonality() {
           ) : (
             (() => {
               const rows = whyData
-              const maxCount = Math.max(...rows.map(r => Number(r.count || 0)))
+              const maxCount = Math.max(...rows.map((r: any) => Number(r.count || 0)))
               return (
                 <div className="space-y-3">
-                  {rows.map(({ bucket, count }) => {
+                  {rows.map(({ bucket, count }: any) => {
                     const label = bucket || 'Unknown'
                     const widthPercent = maxCount > 0 ? (Number(count) / maxCount) * 100 : 0
                     return (
                       <div key={label} className="grid grid-cols-[220px_1fr_auto] items-center gap-3">
-                        <div className="truncate text-sm text-foreground" title={label}>{label}</div>
+                        <div className="truncate text-xs md:text-sm text-foreground" title={label}>{label}</div>
                         <div className="w-full bg-muted rounded-full h-3">
                           <div
                             className="h-3 rounded-full"
@@ -347,7 +302,7 @@ export function DriverPersonality() {
                             aria-valuenow={Number(count)}
                           />
                         </div>
-                        <div className="text-sm tabular-nums text-muted-foreground">{count}</div>
+                        <div className="text-xs md:text-sm tabular-nums text-muted-foreground">{count}</div>
                       </div>
                     )
                   })}

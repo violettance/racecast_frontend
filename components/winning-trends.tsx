@@ -126,20 +126,10 @@ export function WinningTrends() {
     queryFn: async () => {
       if (!selectedDriver) return []
       
-      const query = `
-        SELECT 
-          year,
-          COUNT(CASE WHEN position = 1 THEN 1 END) as wins,
-          COUNT(CASE WHEN position <= 3 THEN 1 END) as podiums
-        FROM enhanced_dataset 
-        WHERE driver_id = '${selectedDriver}' AND year BETWEEN 2018 AND 2024
-        GROUP BY year
-        HAVING COUNT(CASE WHEN position = 1 THEN 1 END) > 0 OR COUNT(CASE WHEN position <= 3 THEN 1 END) > 0
-        ORDER BY year
-      `
-      
-      const result = await neonClient.query(query)
-      return result && Array.isArray(result) ? result as any[] : []
+      const response = await fetch(`/api/winning-trends?type=driver&driverId=${selectedDriver}`)
+      if (!response.ok) throw new Error('Failed to fetch driver trends')
+      const data = await response.json()
+      return data.data || []
     },
     enabled: !!selectedDriver,
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -155,40 +145,10 @@ export function WinningTrends() {
     queryFn: async () => {
       if (!selectedConstructor) return []
       
-      // Handle team name changes - RB F1 Team is the continuation of AlphaTauri/Toro Rosso
-      let query = `
-        SELECT 
-          year,
-          COUNT(CASE WHEN position = 1 THEN 1 END) as wins,
-          COUNT(CASE WHEN position <= 3 THEN 1 END) as podiums
-        FROM enhanced_dataset 
-        WHERE year BETWEEN 2018 AND 2024
-      `
-      
-      if (selectedConstructor === 'rb') {
-        // RB F1 Team = AlphaTauri + Toro Rosso combined
-        query += ` AND (constructor_id = 'rb' OR constructor_id = 'alphatauri' OR constructor_id = 'toro_rosso')`
-      } else if (selectedConstructor === 'stake_f1_team') {
-        // Stake F1 Team = Sauber + Alfa Romeo combined
-        query += ` AND (constructor_id = 'stake_f1_team' OR constructor_id = 'sauber' OR constructor_id = 'alfa_romeo')`
-      } else if (selectedConstructor === 'alpine') {
-        // Alpine = Renault combined
-        query += ` AND (constructor_id = 'alpine' OR constructor_id = 'renault')`
-      } else if (selectedConstructor === 'aston_martin') {
-        // Aston Martin = Force India + Racing Point combined
-        query += ` AND (constructor_id = 'aston_martin' OR constructor_id = 'force_india' OR constructor_id = 'racing_point')`
-      } else {
-        query += ` AND constructor_id = '${selectedConstructor}'`
-      }
-      
-      query += `
-        GROUP BY year
-        HAVING COUNT(CASE WHEN position = 1 THEN 1 END) > 0 OR COUNT(CASE WHEN position <= 3 THEN 1 END) > 0
-        ORDER BY year
-      `
-      
-      const result = await neonClient.query(query)
-      return result && Array.isArray(result) ? result as any[] : []
+      const response = await fetch(`/api/winning-trends?type=constructor&constructorId=${selectedConstructor}`)
+      if (!response.ok) throw new Error('Failed to fetch constructor trends')
+      const data = await response.json()
+      return data.data || []
     },
     enabled: !!selectedConstructor,
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -218,7 +178,7 @@ export function WinningTrends() {
         {/* Driver Chart */}
         <Card className="border-border shadow-sm">
           <CardHeader>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start">
               <div>
                 <CardTitle>Driver Performance Trends</CardTitle>
                 <CardDescription>
@@ -228,7 +188,7 @@ export function WinningTrends() {
                   }
                 </CardDescription>
               </div>
-              <div className="w-64">
+              <div className="w-full md:w-64 mt-4 md:mt-0">
                 <label className="text-sm font-medium text-foreground mb-2 block">Driver</label>
                 <Select value={selectedDriver} onValueChange={handleDriverChange} disabled={driversLoading}>
                   <SelectTrigger className="w-full">
@@ -303,7 +263,7 @@ export function WinningTrends() {
         {/* Team Chart */}
         <Card className="border-border shadow-sm">
           <CardHeader>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start">
               <div>
                 <CardTitle>Team Performance Trends</CardTitle>
                 <CardDescription>
@@ -313,7 +273,7 @@ export function WinningTrends() {
                   }
                 </CardDescription>
               </div>
-              <div className="w-64">
+              <div className="w-full md:w-64 mt-4 md:mt-0">
                 <label className="text-sm font-medium text-foreground mb-2 block">Team</label>
                 <Select value={selectedConstructor} onValueChange={handleConstructorChange} disabled={constructorsLoading}>
                   <SelectTrigger className="w-full">

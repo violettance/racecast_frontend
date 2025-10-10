@@ -52,13 +52,8 @@ export function EraRegulation() {
   }
 
   if (!data) {
-    console.log('No data available')
     return null
   }
-  
-  console.log('Rendering with data:', data)
-  console.log('Era comparisons:', data.era_comparisons)
-  console.log('Key insights:', data.key_insights)
 
   return (
     <div className="space-y-6">

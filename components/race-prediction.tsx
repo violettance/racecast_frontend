@@ -26,10 +26,10 @@ export function RacePrediction() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
-          <p className="text-muted-foreground">Loading race data...</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
+          <p className="text-sm md:text-base text-muted-foreground">Loading race data...</p>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
@@ -43,10 +43,10 @@ export function RacePrediction() {
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
-          <p className="text-muted-foreground">Error loading data</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
+          <p className="text-sm md:text-base text-muted-foreground">Error loading data</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
@@ -59,20 +59,20 @@ export function RacePrediction() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
-        <p className="text-muted-foreground">Predictions based on 2018-2024 F1 data analysis</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Race Prediction Model</h2>
+        <p className="text-sm md:text-base text-muted-foreground">Predictions based on 2018-2024 F1 data analysis</p>
       </div>
 
       {/* Race State Logic */}
       {raceState === 'NO_PREDICTIONS' && (
         <Card className="border-border shadow-sm bg-gradient-to-br from-card to-muted/20">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-destructive" />
-              {nextRace ? `Next Race: ${nextRace.name}` : "Upcoming Race"}
+            <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+              <Calendar className="w-4 h-4 md:w-5 md:h-5 text-destructive" />
+              <span className="truncate">{nextRace ? `Next Race: ${nextRace.name}` : "Upcoming Race"}</span>
             </CardTitle>
             {nextRace && (
               <CardDescription className="mt-1">
@@ -83,23 +83,23 @@ export function RacePrediction() {
           <CardContent className="space-y-4">
             {nextRace ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <MapPin className="w-5 h-5 text-destructive" />
+                    <MapPin className="w-4 h-4 md:w-5 md:h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Circuit</p>
-                      <p className="font-medium text-sm text-foreground">{nextRace.circuit || "TBA"}</p>
+                      <p className="font-medium text-sm text-foreground truncate">{nextRace.circuit || "TBA"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <Clock className="w-5 h-5 text-destructive" />
+                    <Clock className="w-4 h-4 md:w-5 md:h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Race Time (UTC)</p>
                       <p className="font-medium text-sm text-foreground">{nextRace.time || "TBA"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-card">
-                    <Trophy className="w-5 h-5 text-destructive" />
+                    <Trophy className="w-4 h-4 md:w-5 md:h-5 text-destructive" />
                     <div>
                       <p className="text-xs text-muted-foreground">Days to Qualifying</p>
                       <p className="font-medium text-sm text-foreground">
@@ -187,18 +187,28 @@ export function RacePrediction() {
         <>
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                 <div>
                   <CardTitle className="text-xl flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-destructive" />
+                    <Trophy className="w-5 h-5 text-destructive hidden md:block" />
                     Previous Race: {previousRace.name}
                   </CardTitle>
                   <CardDescription className="mt-1">
                     {previousRace.date} • {previousRace.circuit}
                   </CardDescription>
+                  {previousRace.accuracy && (
+                    <div className="flex gap-2 mt-2 md:hidden">
+                      <Badge className="text-xs bg-green-600 text-white border-green-600 hover:bg-green-700">
+                        Top 3: {previousRace.accuracy.top3}%
+                      </Badge>
+                      <Badge className="text-xs bg-green-600 text-white border-green-600 hover:bg-green-700">
+                        Top 5: {previousRace.accuracy.top5}%
+                      </Badge>
+                    </div>
+                  )}
                 </div>
                 {previousRace.accuracy && (
-                  <div className="flex gap-2">
+                  <div className="hidden md:flex gap-2">
                     <Badge className="text-sm bg-green-600 text-white border-green-600 hover:bg-green-700">
                       Top 3: {previousRace.accuracy.top3}%
                     </Badge>
@@ -211,23 +221,23 @@ export function RacePrediction() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="grid grid-cols-12 gap-4 text-xs font-medium text-muted-foreground pb-2 border-b border-border">
+                <div className="grid grid-cols-12 gap-2 md:gap-4 text-xs font-medium text-muted-foreground pb-2 border-b border-border">
                   <div className="col-span-5">Driver</div>
                   <div className="col-span-4">Team</div>
-                  <div className="col-span-2">Prediction</div>
-                  <div className="col-span-1">Actual Rank</div>
+                  <div className="col-span-2 text-xs md:text-xs text-center">Pred</div>
+                  <div className="col-span-1 text-xs md:text-xs text-center">Actual</div>
                 </div>
                 {previousRace.predictions?.map((item: any) => (
                   <div
                     key={`${item.driverCode}-${item.position}`}
-                    className="grid grid-cols-12 gap-4 items-center py-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    className="grid grid-cols-12 gap-2 md:gap-4 items-center py-2 rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <div className="col-span-5 font-medium text-foreground">{item.driverName}</div>
-                    <div className="col-span-4 text-sm text-muted-foreground">{item.teamName}</div>
-                    <div className="col-span-2 text-sm">
+                    <div className="col-span-5 font-medium text-foreground text-sm md:text-base">{item.driverName}</div>
+                    <div className="col-span-4 text-xs md:text-sm text-muted-foreground">{item.teamName}</div>
+                    <div className="col-span-2 text-xs md:text-sm text-center">
                       <span className="text-foreground">P{item.position}</span>
                     </div>
-                    <div className="col-span-1 text-sm">
+                    <div className="col-span-1 text-xs md:text-sm text-center">
                       {item.actualRank ? (
                         <span className="text-foreground">P{item.actualRank}</span>
                       ) : (
@@ -245,7 +255,7 @@ export function RacePrediction() {
             <Card className="border-border shadow-sm bg-gradient-to-br from-card to-muted/20">
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-destructive" />
+                  <Calendar className="w-5 h-5 text-destructive hidden md:block" />
                   Next Race: {nextRace.name}
                 </CardTitle>
                 <CardDescription className="mt-1">
