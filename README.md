@@ -216,4 +216,4 @@ This project is licensed under the GNU General Public License v3.0. (GPL-3.0)
 
 **Built with ❤️ for F1 fans and data enthusiasts**
 
-*Model Version: v2.4.1 • Updated 2025*
+*Version: 0.1.0 • Updated 2025*

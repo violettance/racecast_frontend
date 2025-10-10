@@ -115,8 +115,8 @@ export default function F1Dashboard() {
 
         <div className="mt-6 pt-6 border-t border-border">
           <div className="text-xs text-muted-foreground">
-            <p className="font-medium mb-1">Model Version</p>
-            <p>v2.4.1 • Updated 2025</p>
+            <p className="font-medium mb-1">Version</p>
+            <p>0.1.0 • Updated 2025</p>
           </div>
         </div>
       </aside>
